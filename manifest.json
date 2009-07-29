@@ -1,0 +1,16 @@
+{
+	"name": "Show Girls", 
+	"version": "0.1.0",
+	"description": "Show a beauty at the top corner whenever you visit a website", 
+	"permissions": [
+		"http://*/*"
+	],
+	"background_page": "background.html",
+	"content_scripts": [
+		{ 
+			"js": [ "content.js" ],
+			"css": [ "content.css" ],
+			"matches": [ "http://*/*", "https://*/*" ] 
+		}
+	]
+}

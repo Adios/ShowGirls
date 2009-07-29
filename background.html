@@ -1,0 +1,59 @@
+<html>
+<head>
+<script>
+	var res = suck({ keyword: '洪詩' });
+	shuffle.call(res.photos.photo);
+
+	chrome.extension.onConnect.addListener(function(port) {
+		if (port.name == 'suck') {
+			port.onMessage.addListener(function(href) {
+			});
+			port.postMessage(take( res.photos.photo ));
+		} else if (port.name == 'open') {
+			port.onMessage.addListener(function(href) {
+				chrome.tabs.create({ url: href, selected: false });
+			});
+		}
+	});
+	
+	function take( photos ) {
+		var photo = photos.pop();
+		return src(photo);
+	};
+
+	function shuffle() {
+		for ( var i = this.length, j, buf; i; j = parseInt ( Math.random() * i ), buf = this[--i], this[i] = this[j], this[j] = buf ); 
+	};
+
+	function suck( opt ) {
+		var req = new XMLHttpRequest();
+		
+		req.open('GET',
+			'http://api.flickr.com/services/rest/?' + 
+			'method=flickr.photos.search&' +
+			'api_key=a511d6ed131fc7a2cd80c45e09cb94cc&' +
+			'format=json&' +
+			'nojsoncallback=1&' +
+			'text=' + opt.keyword + '&' +
+			'content_type=1&' +
+			'per_page=300'
+		, false);
+
+		req.send(null);
+		return JSON.parse(req.responseText);
+	};
+
+	function src(photo) {
+		var cons = function(dimension) { 
+				return 'http://farm' + photo.farm + '.static.flickr.com/' + photo.server + 
+					'/' + photo.id + '_' + photo.secret +  dimension + '.jpg';
+			},
+			consPage = function() {
+				return 'http://www.flickr.com/photos/' + photo.owner + '/' + photo.id;
+			};
+
+		return { square: cons('_s'), medium: cons(''), small: cons('_m'), page: consPage(), title: photo.title };
+	};
+</script>
+</head>
+</html>
